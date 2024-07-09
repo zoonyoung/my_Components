@@ -1,14 +1,17 @@
 import { useContext } from "react";
 import { ModalContext } from "../context/ModalContext";
 
-const useModal = (modal: React.ReactNode) => {
+const useModal = (modal: React.ComponentType<{ onClose: () => void }>) => {
   const modalContext = useContext(ModalContext);
-  if (modalContext) {
-    const { registerModal } = modalContext;
-    const openModal = () => registerModal(modal);
-    const closeModal = () => registerModal(null);
-    return { openModal, closeModal };
+
+  if (!modalContext) {
+    throw new Error("ModalContext is null");
   }
-  throw new Error("error");
+
+  const { registerModal, closeModal } = modalContext;
+  const openModal = () => registerModal(modal);
+
+  return { openModal, closeModal };
 };
+
 export default useModal;

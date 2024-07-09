@@ -1,19 +1,33 @@
 import useKeydown from "@/hooks/useKeydown";
 import usePreventScroll from "@/hooks/usePreventScroll";
+import { useContext } from "react";
+import { ModalContext } from "./context/ModalContext";
 import styles from "./WithModal.module.scss";
 
-const WithModal = ({ render, onClose }: { render: React.ReactNode; onClose: () => void }) => {
-  usePreventScroll();
-  useKeydown("Escape", onClose);
+const WithModal = () => {
+  const modalContext = useContext(ModalContext);
 
-  const handleClickOutside = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  if (!modalContext) {
+    return null;
+  }
+
+  const { modal, closeModal } = modalContext;
+  const Component = modal.Component;
+
+  usePreventScroll();
+  useKeydown("Escape", closeModal);
+
+  const handleClickOutside = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
     if (event.target === event.currentTarget) {
-      onClose();
+      closeModal();
     }
   };
+
   return (
     <div className={styles.container} onClick={handleClickOutside}>
-      {render}
+      {Component && <Component onClose={closeModal} />}
     </div>
   );
 };
